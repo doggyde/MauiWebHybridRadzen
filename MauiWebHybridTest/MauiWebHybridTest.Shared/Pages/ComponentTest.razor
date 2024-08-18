@@ -1,0 +1,276 @@
+﻿@page "/ComponentTest"
+@using System.Globalization
+
+<h3>Radzen Vlazor Component Test</h3>
+
+<RadzenAccordion Collapse=@(args => Change(args, "collapsed"))
+                 Expand=@(args => Change(args, "expanded"))>
+    <Items>
+        <RadzenAccordionItem Text="Orders" Icon="account_balance_wallet">
+            Details for Orders
+        </RadzenAccordionItem>
+        <RadzenAccordionItem Text="Employees" Icon="account_box">
+            Details for Employees
+        </RadzenAccordionItem>
+        <RadzenAccordionItem Text="Customers" Icon="accessibility">
+            Details for Customers
+        </RadzenAccordionItem>
+    </Items>
+</RadzenAccordion>
+
+<RadzenArcGauge>
+    <RadzenArcGaugeScale StartAngle="0" EndAngle="360">
+        <RadzenArcGaugeScaleValue Value="50" />
+    </RadzenArcGaugeScale>
+</RadzenArcGauge>
+
+<RadzenBadge BadgeStyle="BadgeStyle.Primary" Text="Primary" />
+<RadzenBadge BadgeStyle="BadgeStyle.Secondary" Text="Secondary" />
+<RadzenBadge BadgeStyle="BadgeStyle.Light" Text="Light" />
+<RadzenBadge BadgeStyle="BadgeStyle.Success" Text="Success" />
+<RadzenBadge BadgeStyle="BadgeStyle.Danger" Text="Danger" />
+<RadzenBadge BadgeStyle="BadgeStyle.Warning" Text="Warning" />
+<RadzenBadge BadgeStyle="BadgeStyle.Info" Text="Info" />
+
+<RadzenBreadCrumb>
+    <Items>
+        <RadzenBreadCrumbItem Text="Layout & Navigation" />
+        <RadzenBreadCrumbItem Text="Bread Crumb" />
+    </Items>
+</RadzenBreadCrumb>
+
+<RadzenButton ButtonType="ButtonType.Submit" Text="Save" />
+
+<RadzenSplitButton Click=@OnClick Text="SplitButton" Icon="account_circle">
+    <ChildContent>
+        <RadzenSplitButtonItem Text="Item1" Value="1" Icon="account_box" />
+        <RadzenSplitButtonItem Text="Item2" Value="2" Icon="account_balance_wallet" />
+    </ChildContent>
+</RadzenSplitButton>
+
+
+<RadzenDataGrid AllowFiltering="true" AllowColumnResize="true" AllowAlternatingRows="false" FilterMode="FilterMode.Advanced" AllowSorting="true" PageSize="5" AllowPaging="true" PagerHorizontalAlign="HorizontalAlign.Left" ShowPagingSummary="true"
+                Data="@employees" ColumnWidth="300px" LogicalFilterOperator="LogicalFilterOperator.Or" SelectionMode="DataGridSelectionMode.Single" @bind-Value=@selectedEmployees>
+    <Columns>
+        <RadzenDataGridColumn Property="@nameof(Employee.EmployeeID)" Filterable="false" Title="ID" Frozen="true" Width="80px" TextAlign="TextAlign.Center" />
+        <RadzenDataGridColumn Property="@nameof(Employee.FirstName)" Title="First Name" Frozen="true" Width="160px" />
+        <RadzenDataGridColumn Property="@nameof(Employee.LastName)" Title="Last Name" Width="160px" />
+        <RadzenDataGridColumn Property="@nameof(Employee.Title)" Title="Job Title" Width="200px" />
+        <RadzenDataGridColumn Property="@nameof(Employee.TitleOfCourtesy)" Title="Title" Width="120px" />
+        <RadzenDataGridColumn Property="@nameof(Employee.BirthDate)" Title="Birth Date" FormatString="{0:d}" Width="160px" />
+        <RadzenDataGridColumn Property="@nameof(Employee.HireDate)" Title="Hire Date" FormatString="{0:d}" Width="160px" />
+    </Columns>
+</RadzenDataGrid>
+
+<RadzenStack class="rz-p-0 rz-p-md-6 rz-p-lg-12">
+    <RadzenCard Variant="Variant.Outlined">
+        <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Wrap="FlexWrap.Wrap">
+            <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0.5rem">
+                <RadzenCheckBox @bind-Value="@smooth" Name="smooth"></RadzenCheckBox>
+                <RadzenLabel Text="Smooth" Component="smooth" />
+            </RadzenStack>
+            <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0.5rem">
+                <RadzenCheckBox @bind-Value="@showDataLabels" Name="dataLabels"></RadzenCheckBox>
+                <RadzenLabel Text="Show Data Labels" Component="dataLabels" />
+            </RadzenStack>
+        </RadzenStack>
+    </RadzenCard>
+
+    <RadzenChart>
+        <RadzenAreaSeries Smooth="@smooth" Data="@revenue2023" CategoryProperty="Date" Title="2023" ValueProperty="Revenue" RenderingOrder="1">
+            <RadzenSeriesDataLabels Visible="@showDataLabels" />
+        </RadzenAreaSeries>
+        <RadzenAreaSeries Smooth="@smooth" Data="@revenue2024" CategoryProperty="Date" Title="2024" LineType="LineType.Dashed" ValueProperty="Revenue">
+            <RadzenSeriesDataLabels Visible="@showDataLabels" />
+        </RadzenAreaSeries>
+        <RadzenCategoryAxis Padding="20" />
+        <RadzenValueAxis Formatter="@FormatAsUSD">
+            <RadzenGridLines Visible="true" />
+            <RadzenAxisTitle Text="Revenue in USD" />
+        </RadzenValueAxis>
+    </RadzenChart>
+</RadzenStack>
+
+@code {
+
+    class Employee     {
+        public int EmployeeID { get; set; }
+        public string FirstName { get; set; }
+        public string LastName { get; set; }
+        public string Title { get; set; }
+        public string TitleOfCourtesy { get; set; }
+        public DateTime BirthDate { get; set; }
+        public DateTime HireDate { get; set; }
+    }
+
+    IEnumerable<Employee> employees = new List<Employee>()
+    {
+        new Employee()
+        {
+            FirstName = "Marcus",
+            LastName = "Knuth"
+        }
+    };
+    IList<Employee> selectedEmployees;
+
+
+    void Change(object value, string action)
+    {
+        Console.WriteLine($"Item with index {value} {action}");
+    }
+
+    void OnClick(RadzenSplitButtonItem item)
+    {
+        if (item != null)
+        {
+            Console.WriteLine($"Item with value {item.Value} clicked");
+        }
+        else
+        {
+            Console.WriteLine($"Button clicked");
+        }
+    }
+
+
+
+
+    bool smooth = true;
+    bool showDataLabels = false;
+
+    class DataItem
+    {
+        public string Date { get; set; }
+        public double Revenue { get; set; }
+    }
+
+    string FormatAsUSD(object value)
+    {
+        return ((double)value).ToString("C0", CultureInfo.CreateSpecificCulture("en-US"));
+    }
+
+    DataItem[] revenue2023 = new DataItem[] {
+        new DataItem
+        {
+            Date = "Jan",
+            Revenue = 234000
+        },
+        new DataItem
+        {
+            Date = "Feb",
+            Revenue = 269000
+        },
+        new DataItem
+        {
+            Date = "Mar",
+            Revenue = 233000
+        },
+        new DataItem
+        {
+            Date = "Apr",
+            Revenue = 244000
+        },
+        new DataItem
+        {
+            Date = "May",
+            Revenue = 214000
+        },
+        new DataItem
+        {
+            Date = "Jun",
+            Revenue = 253000
+        },
+        new DataItem
+        {
+            Date = "Jul",
+            Revenue = 274000
+        },
+        new DataItem
+        {
+            Date = "Aug",
+            Revenue = 284000
+        },
+        new DataItem
+        {
+            Date = "Sept",
+            Revenue = 273000
+        },
+        new DataItem
+        {
+            Date = "Oct",
+            Revenue = 282000
+        },
+        new DataItem
+        {
+            Date = "Nov",
+            Revenue = 289000
+        },
+        new DataItem
+        {
+            Date = "Dec",
+            Revenue = 294000
+        }
+    };
+
+    DataItem[] revenue2024 = new DataItem[] {
+        new DataItem
+        {
+            Date = "Jan",
+            Revenue = 334000
+        },
+        new DataItem
+        {
+            Date = "Feb",
+            Revenue = 369000
+        },
+        new DataItem
+        {
+            Date = "Mar",
+            Revenue = 333000
+        },
+        new DataItem
+        {
+            Date = "Apr",
+            Revenue = 344000
+        },
+        new DataItem
+        {
+            Date = "May",
+            Revenue = 314000
+        },
+        new DataItem
+        {
+            Date = "Jun",
+            Revenue = 353000
+        },
+        new DataItem
+        {
+            Date = "Jul",
+            Revenue = 374000
+        },
+        new DataItem
+        {
+            Date = "Aug",
+            Revenue = 384000
+        },
+        new DataItem
+        {
+            Date = "Sept",
+            Revenue = 373000
+        },
+        new DataItem
+        {
+            Date = "Oct",
+            Revenue = 382000
+        },
+        new DataItem
+        {
+            Date = "Nov",
+            Revenue = 389000
+        },
+        new DataItem
+        {
+            Date = "Dec",
+            Revenue = 394000
+        }
+    };
+}
